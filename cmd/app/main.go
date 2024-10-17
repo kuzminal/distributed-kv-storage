@@ -1,16 +1,15 @@
 package main
 
 import (
-	"context"
 	"distapp/internal/app"
 	"distapp/internal/router"
 	"distapp/internal/store"
-	"github.com/hashicorp/serf/serf"
-	"github.com/pkg/errors"
 	"log"
 	"net/http"
 	"os"
-	"time"
+
+	"github.com/hashicorp/serf/serf"
+	"github.com/pkg/errors"
 )
 
 func main() {
@@ -24,27 +23,30 @@ func main() {
 	storage := store.NewInMemory()
 	i := app.NewInstance(storage, cluster)
 	r := router.NewRouter(i)
-	go func() {
-		if err := http.ListenAndServe(":8080", r); err != nil {
-			log.Println(err)
-		}
-	}()
+	// go func() {
+	// 	if err := http.ListenAndServe(":8080", r); err != nil {
+	// 		log.Println(err)
+	// 	}
+	// }()
 
-	ctx := context.Background()
-	if name, err := os.Hostname(); err == nil {
-		ctx = context.WithValue(ctx, "name", name)
+	if err := http.ListenAndServe(":8080", r); err != nil {
+		log.Println(err)
 	}
+	// ctx := context.Background()
+	// if name, err := os.Hostname(); err == nil {
+	// 	ctx = context.WithValue(ctx, "name", name)
+	// }
 
-	debugDataPrinterTicker := time.Tick(time.Second * 5)
-	for {
-		select {
-		case <-debugDataPrinterTicker:
-			log.Printf("Members: %v\n", cluster.Members())
+	// debugDataPrinterTicker := time.Tick(time.Second * 5)
+	// for {
+	// 	select {
+	// 	case <-debugDataPrinterTicker:
+	// 		log.Printf("Members: %v\n", cluster.Members())
 
-			/*curVal, curGen := storage.GetValue("id")
-			log.Printf("State: Val: %v Gen: %v\n", curVal, curGen)*/
-		}
-	}
+	// 		/*curVal, curGen := storage.GetValue("id")
+	// 		log.Printf("State: Val: %v Gen: %v\n", curVal, curGen)*/
+	// 	}
+	// }
 }
 
 func setupCluster(advertiseAddr string, clusterAddr string) (*serf.Serf, error) {

@@ -5,11 +5,12 @@ import (
 	"distapp/models"
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func (i *Instance) Get(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +19,7 @@ func (i *Instance) Get(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	val, gen := i.storage.GetValue("id")
+	val, gen := i.storage.GetValue(id)
 	fmt.Fprintf(w, "%v:%v", val, gen)
 }
 
